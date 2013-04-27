@@ -46,7 +46,8 @@ public:
 
   // Required overrides
   bool SendDecoderConfig();
-  bool Open(CDVDStreamInfo &hints, OMXClock *clock, bool deinterlace = false, bool hdmi_clock_sync = false);
+  bool Open(CDVDStreamInfo &hints, OMXClock *clock, bool deinterlace = false, bool hdmi_clock_sync = false, void* boblight_instance = NULL, int boblight_sizedown = 64, int boblight_margin = 10, int boblight_timeout = 35);
+  void Close(void);
   void RegisterResolutionUpdateCallBack(void *ctx, ResolutionUpdateCallBackFn callback) { m_res_ctx = ctx; m_res_callback = callback; }
   void Close(void);
   unsigned int GetFreeSpace();
@@ -73,6 +74,13 @@ protected:
   unsigned int      m_decoded_height;
 
   OMX_VIDEO_CODINGTYPE m_codingType;
+
+//boblight parameter
+static void* m_boblight;// = NULL;
+int m_boblight_sizedown;// = 64;
+int m_boblight_margin;// = 10;
+static int m_boblight_timeout;// = 35;
+static std::vector<std::string> m_boblight_options; 
 
   COMXCoreComponent m_omx_decoder;
   COMXCoreComponent m_omx_render;

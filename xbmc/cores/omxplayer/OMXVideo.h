@@ -49,7 +49,6 @@ public:
   bool Open(CDVDStreamInfo &hints, OMXClock *clock, bool deinterlace = false, bool hdmi_clock_sync = false, void* boblight_instance = NULL, int boblight_sizedown = 64, int boblight_margin = 10, int boblight_timeout = 35);
   void Close(void);
   void RegisterResolutionUpdateCallBack(void *ctx, ResolutionUpdateCallBackFn callback) { m_res_ctx = ctx; m_res_callback = callback; }
-  void Close(void);
   unsigned int GetFreeSpace();
   unsigned int GetSize();
   int  Decode(uint8_t *pData, int iSize, double dts, double pts);

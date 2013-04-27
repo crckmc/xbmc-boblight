@@ -1045,7 +1045,7 @@ void* COMXVideo::BoblightClientThread(void* data){
     }
 
     //the buffer was processed completely
-    OMXClock::OMXSleep(COMXVideo::m_boblight_timeout);
+    Sleep(COMXVideo::m_boblight_timeout);
   }
   pthread_exit(0); 
 }

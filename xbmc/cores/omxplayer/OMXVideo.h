@@ -75,12 +75,6 @@ protected:
 
   OMX_VIDEO_CODINGTYPE m_codingType;
 
-//boblight parameter
-static void* m_boblight;// = NULL;
-int m_boblight_sizedown;// = 64;
-int m_boblight_margin;// = 10;
-static int m_boblight_timeout;// = 35;
-static std::vector<std::string> m_boblight_options; 
 
   COMXCoreComponent m_omx_decoder;
   COMXCoreComponent m_omx_render;
@@ -89,6 +83,8 @@ static std::vector<std::string> m_boblight_options;
   COMXCoreComponent m_omx_split;
   COMXCoreComponent m_omx_resize;
 
+//boblight parameter
+static std::vector<std::string> m_boblight_options; 
   static void*      m_boblight; //pointer to boblight instance
   int               m_boblight_sizedown;
   int               m_boblight_margin;

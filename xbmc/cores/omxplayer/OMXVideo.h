@@ -63,6 +63,9 @@ public:
   bool IsEOS();
   bool SubmittedEOS() { return m_submitted_eos; }
   bool BadState() { return m_omx_decoder.BadState(); };
+  static void* BoblightClientThread(void* data);
+  static OMX_ERRORTYPE BufferDoneHandler(OMX_HANDLETYPE hComponent, OMX_PTR pAppData, OMX_BUFFERHEADERTYPE* pBuffer);
+
 protected:
   // Video format
   bool              m_drop_state;
@@ -75,6 +78,30 @@ protected:
   COMXCoreComponent m_omx_render;
   COMXCoreComponent m_omx_sched;
   COMXCoreComponent m_omx_image_fx;
+  COMXCoreComponent m_omx_split;
+  COMXCoreComponent m_omx_resize;
+
+  static void*      m_boblight; //pointer to boblight instance
+  int               m_boblight_sizedown;
+  int               m_boblight_margin;
+  //internal boblight variables follow
+  static unsigned int m_boblight_margin_t; 
+  static unsigned int m_boblight_margin_b;
+  static unsigned int m_boblight_margin_l;
+  static unsigned int m_boblight_margin_r;
+  static int        m_boblight_width;
+  static int        m_boblight_height;
+  static int        m_boblight_timeout;
+  static OMX_BUFFERHEADERTYPE*    m_boblight_bufferpointer;
+  //boblight threads
+  static volatile bool m_boblight_threadstop; //set true to stop all threads
+
+  static pthread_t  m_boblight_clientthread;
+
+  static pthread_mutex_t m_boblight_bufferdone_mutex;
+  static pthread_cond_t  m_boblight_bufferdone_cond;
+  static volatile bool m_boblight_bufferdone_flag;
+
   COMXCoreComponent *m_omx_clock;
   OMXClock           *m_av_clock;
 
@@ -82,6 +109,8 @@ protected:
   COMXCoreTunel     m_omx_tunnel_clock;
   COMXCoreTunel     m_omx_tunnel_sched;
   COMXCoreTunel     m_omx_tunnel_image_fx;
+  COMXCoreTunel     m_omx_tunnel_split;
+  COMXCoreTunel     m_omx_tunnel_resize;
   bool              m_is_open;
 
   bool              m_Pause;

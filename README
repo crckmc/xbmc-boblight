@@ -1,3 +1,8 @@
+This is a modified vesion of xbmc which includes Stasik0's omxplayer fixes to enable boblight on a RaspberryPi.
+For it to compile you need to follow this guide http://www.raspbmc.com/wiki/technical/building-xbmc/ and make sure
+that you have libboblight installed in /usr/local/lib  and the header files are in /usr/local/include/libboblight.
+Feel free to tidy up ;)
+
 About
 -----
 XBMC is an award-winning free and open source (GPL) software media player and

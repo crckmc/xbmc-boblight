@@ -164,6 +164,8 @@ public:
   bool IsEOS() { return m_eos; };
   bool BadState() { return m_resource_error; };
   void ResetEos();
+  void SetCustomDecoderFillBufferDoneHandler(OMX_ERRORTYPE (*p)(OMX_HANDLETYPE, OMX_PTR, OMX_BUFFERHEADERTYPE*)){ CustomDecoderFillBufferDoneHandler = p;};
+  void SetCustomDecoderEmptyBufferDoneHandler(OMX_ERRORTYPE (*p)(OMX_HANDLETYPE, OMX_PTR, OMX_BUFFERHEADERTYPE*)){ CustomDecoderEmptyBufferDoneHandler = p;};
 
 private:
   OMX_HANDLETYPE m_handle;
@@ -176,6 +178,10 @@ private:
   std::vector<omx_event> m_omx_events;
 
   OMX_CALLBACKTYPE  m_callbacks;
+
+  //additional event handlers
+  OMX_ERRORTYPE (*CustomDecoderFillBufferDoneHandler)(OMX_HANDLETYPE, OMX_PTR, OMX_BUFFERHEADERTYPE*);
+  OMX_ERRORTYPE (*CustomDecoderEmptyBufferDoneHandler)(OMX_HANDLETYPE, OMX_PTR, OMX_BUFFERHEADERTYPE*);
 
   // OMXCore input buffers (demuxer packets)
   pthread_mutex_t   m_omx_input_mutex;

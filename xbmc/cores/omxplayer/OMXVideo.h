@@ -79,8 +79,8 @@ protected:
   COMXCoreComponent m_omx_render;
   COMXCoreComponent m_omx_sched;
   COMXCoreComponent m_omx_image_fx;
-  COMXCoreComponent m_omx_split;
-  COMXCoreComponent m_omx_resize;
+  static COMXCoreComponent m_omx_split;
+  static COMXCoreComponent m_omx_resize;
 
 //boblight parameter
 static std::vector<std::string> m_boblight_options; 

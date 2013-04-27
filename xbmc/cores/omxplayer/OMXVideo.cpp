@@ -893,7 +893,7 @@ void COMXVideo::Close()
     //signal thread to stop
     COMXVideo::m_boblight_threadstop = true;
     //wait for thread to terminate nicely
-    pthread_join(COMXVideo::m_boblight_clientthread, NULL);
+    //pthread_join(COMXVideo::m_boblight_clientthread, NULL);
     //cleanup thread related stuff
     pthread_mutex_destroy(&COMXVideo::m_boblight_bufferdone_mutex);
     pthread_cond_destroy(&COMXVideo::m_boblight_bufferdone_cond); 
@@ -989,7 +989,7 @@ void* COMXVideo::BoblightClientThread(void* data){
   OMX_BUFFERHEADERTYPE *omx_buffer_fb;
   OMX_PARAM_U32TYPE singlestep_param;
   OMX_INIT_STRUCTURE(singlestep_param);
-  singlestep_param.nPortIndex = p_omx_split->GetOutputPort();               
+  singlestep_param.nPortIndex = COMXVideo::m_omx_split.GetOutputPort();
   singlestep_param.nU32 = 1;
 
   while(1){
@@ -998,15 +998,15 @@ void* COMXVideo::BoblightClientThread(void* data){
     }
 
     //set the first splitter port into the single-image mode (video goes out through the second one)
-    OMX_ERRORTYPE omx_err = p_omx_split->SetParameter(OMX_IndexConfigSingleStep, &singlestep_param);
+    OMX_ERRORTYPE omx_err = COMXVideo::m_omx_split.SetParameter(OMX_IndexConfigSingleStep, &singlestep_param);
     if(omx_err != OMX_ErrorNone)
     {
       CLog::Log(LOGERROR, "%s::%s - error OMX_IndexConfigSingleStep omx_err(0x%08x)\n", CLASSNAME, __func__, omx_err);
     }
     
     //request a new screenshot
-    omx_buffer_fb = p_omx_resize->GetOutputBuffer();
-    p_omx_resize->FillThisBuffer(omx_buffer_fb); //the callback BufferDoneHandler will be triggered instantly
+    omx_buffer_fb = COMXVideo::m_omx_resize.GetOutputBuffer();
+    COMXVideo::m_omx_resize.FillThisBuffer(omx_buffer_fb); //the callback BufferDoneHandler will be triggered instantly
 
     //wait until a screenshot is available in the buffer
     pthread_mutex_lock(&COMXVideo::m_boblight_bufferdone_mutex);

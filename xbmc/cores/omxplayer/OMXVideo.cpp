@@ -86,6 +86,8 @@ int              COMXVideo::m_boblight_width;
 int              COMXVideo::m_boblight_height;
 int              COMXVideo::m_boblight_timeout;
 bool volatile    COMXVideo::m_boblight_threadstop;
+COMXCoreComponent COMXVideo::m_omx_split;
+COMXCoreComponent COMXVideo::m_omx_resize;
 
 OMX_BUFFERHEADERTYPE* COMXVideo::m_boblight_bufferpointer;
 

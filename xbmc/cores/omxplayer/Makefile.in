@@ -1,4 +1,4 @@
-CXXFLAGS += -D__STDC_FORMAT_MACROS
+CXXFLAGS += -D__STDC_FORMAT_MACROS -I/usr/local/include/libboblight -lboblight
 
 SRCS  = OMXPlayer.cpp
 SRCS += OMXAudio.cpp

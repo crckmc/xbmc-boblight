@@ -236,7 +236,7 @@ CFLAGS=@CFLAGS@
 CXXFLAGS=@CXXFLAGS@
 CXXFLAGS+= -lboblight 
 LDFLAGS=@LDFLAGS@
-LDFLAGS+= -lboblight 
+LDFLAGS+=-L/usr/local/lib -lboblight
 INCLUDES=$(sort @INCLUDES@)
 
 CLEAN_FILES=xbmc.bin xbmc-xrandr libxbmc.so

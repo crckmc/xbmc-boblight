@@ -48,6 +48,21 @@
 #include "cores/VideoRenderers/RenderFlags.h"
 
 #include "OMXPlayer.h"
+#include "boblight.h"
+#include <fstream>
+#include <string>
+#include <iostream>
+using namespace std;
+//boblight parameter
+void* m_boblight = NULL;
+bool m_boblight_enabled = false;
+std::string m_boblight_host = "localhost";
+int m_boblight_port = 19333;
+int m_boblight_priority = 128;
+int m_boblight_sizedown = 112;
+int m_boblight_margin = 5;
+int m_boblight_timeout = 35;
+std::vector<std::string> m_boblight_options; 
 
 class COMXMsgVideoCodecChange : public CDVDMsg
 {
@@ -198,7 +213,10 @@ bool OMXPlayerVideo::CloseStream(bool bWaitForBuffers)
 
   if(m_DllBcmHost.IsLoaded())
     m_DllBcmHost.Unload();
-
+  if(m_boblight){
+  boblight_destroy(m_boblight);
+  m_boblight = NULL;
+  }
   return true;
 }
 
@@ -603,8 +621,145 @@ void OMXPlayerVideo::Flush()
   m_messageQueue.Put(new CDVDMsg(CDVDMsg::GENERAL_FLUSH), 1);
 }
 
+bool replace(std::string& str, const std::string& from, const std::string& to) {
+    size_t start_pos = str.find(from);
+    if(start_pos == std::string::npos)
+        return false;
+    str.replace(start_pos, from.length(), to);
+    return true;
+}
+
+bool read_conf_file(string filename)
+    {
+        //VAR
+            string lineBuf;
+            string optionBuf;
+            ifstream confFile( filename.c_str() );
+			
+        if ( confFile.is_open() )
+        {
+            while ( getline( confFile, lineBuf ) )
+            {
+				CLog::Log(LOGERROR, "Zeile x = %s", lineBuf.c_str());
+					replace(lineBuf, "\n", "");
+					replace(lineBuf, "\r", "");
+                optionBuf = "enabled=true";
+                if ( ( ( int )lineBuf.find( optionBuf ) ) != -1 )
+                {
+                    m_boblight_enabled = true;
+                }
+				optionBuf = "enabled=false";
+                if ( ( ( int )lineBuf.find( optionBuf ) ) != -1 )
+                {
+                    m_boblight_enabled = false;
+                }
+				
+				optionBuf = "host=";
+                if ( ( ( int )lineBuf.find( optionBuf ) ) != -1 )
+                {
+                    lineBuf.erase( 0, optionBuf.length() );
+                    m_boblight_host = lineBuf.c_str();
+					CLog::Log(LOGERROR, "Gefundener Host = %s", m_boblight_host.c_str());
+                }
+			
+				optionBuf = "port=";
+                if ( ( ( int )lineBuf.find( optionBuf ) ) != -1 )
+                {
+                    lineBuf.erase( 0, optionBuf.length() );
+                    m_boblight_port = atoi( lineBuf.c_str() );
+                }
+		
+				optionBuf = "priority=";
+                if ( ( ( int )lineBuf.find( optionBuf ) ) != -1 )
+                {
+                    lineBuf.erase( 0, optionBuf.length() );
+                    m_boblight_priority = atoi( lineBuf.c_str() );
+                }
+
+				optionBuf = "sizedown=";
+                if ( ( ( int )lineBuf.find( optionBuf ) ) != -1 )
+                {
+                    lineBuf.erase( 0, optionBuf.length() );
+                    m_boblight_sizedown = atoi( lineBuf.c_str() );
+                }
+							optionBuf = "margin=";
+                if ( ( ( int )lineBuf.find( optionBuf ) ) != -1 )
+                {
+                    lineBuf.erase( 0, optionBuf.length() );
+                    m_boblight_margin = atoi( lineBuf.c_str() );
+                }
+				optionBuf = "timeout=";
+                if ( ( ( int )lineBuf.find( optionBuf ) ) != -1 )
+                {
+                    lineBuf.erase( 0, optionBuf.length() );
+                    m_boblight_timeout = atoi( lineBuf.c_str() );
+                }
+				//OPTIONS
+				optionBuf = "interpolation=";
+                if ( ( ( int )lineBuf.find( optionBuf ) ) != -1 )
+                {
+                    
+                    m_boblight_options.push_back( lineBuf.c_str() );
+                }
+				optionBuf = "speed=";
+                if ( ( ( int )lineBuf.find( optionBuf ) ) != -1 )
+                {
+                    
+                    m_boblight_options.push_back( lineBuf.c_str() );
+                }
+				optionBuf = "autospeed=";
+                if ( ( ( int )lineBuf.find( optionBuf ) ) != -1 )
+                {
+                    
+                    m_boblight_options.push_back( lineBuf.c_str() );
+                }
+				optionBuf = "saturation=";
+                if ( ( ( int )lineBuf.find( optionBuf ) ) != -1 )
+                {
+                    
+                    m_boblight_options.push_back( lineBuf.c_str() );
+                }
+								optionBuf = "threshold=";
+                if ( ( ( int )lineBuf.find( optionBuf ) ) != -1 )
+                {
+                    
+                    m_boblight_options.push_back( lineBuf.c_str() );
+                }
+				optionBuf = "value=";
+                if ( ( ( int )lineBuf.find( optionBuf ) ) != -1 )
+                {
+                    
+                    m_boblight_options.push_back( lineBuf.c_str() );
+                }
+				optionBuf = "gamma=";
+                if ( ( ( int )lineBuf.find( optionBuf ) ) != -1 )
+                {
+                    
+                    m_boblight_options.push_back( lineBuf.c_str() );
+                }
+
+
+
+/* 
+	  
+	  m_boblight_options.push_back("interpolation=0");
+	  m_boblight_options.push_back("speed=100"); 
+	  m_boblight_options.push_back("autospeed=0");
+      m_boblight_options.push_back("saturation=1.2");
+	  m_boblight_options.push_back("threshold=20"); 
+*/
+			}
+            confFile.close();
+            return true;
+        }
+        return false;
+	  }
+
 bool OMXPlayerVideo::OpenDecoder()
 {
+  //BOBLIGHT OPTIONS einlesen:
+  bool x = read_conf_file("/home/pi/boboptions.txt");
+
   if(!m_av_clock)
     return false;
 
@@ -624,8 +779,90 @@ bool OMXPlayerVideo::OpenDecoder()
 
   m_av_clock->Lock();
   m_av_clock->OMXStop(false);
+//Boblight
+if(!m_boblight_enabled)
+	CLog::Log(LOGERROR, "Boblight is disabled");
+    
+  //BOBLIGHT 
+  if(m_boblight_enabled && !m_boblight){
+    m_boblight = boblight_init();
+	CLog::Log(LOGERROR, "Verbinde zu Host = %s auf Port: %d", m_boblight_host.c_str(), m_boblight_port);
+    if (!boblight_connect(m_boblight, m_boblight_host.c_str(), m_boblight_port, 5000000) || !boblight_setpriority(m_boblight, m_boblight_priority))
+    {
+      printf("Boblight: Error connecting to boblight deamon at %s:%i: %s\n", m_boblight_host.c_str(), m_boblight_port, boblight_geterror(m_boblight));
+      boblight_destroy(m_boblight);
+      m_boblight = NULL;
+      return 0;
+    }
 
-  bool bVideoDecoderOpen = m_omxVideo.Open(m_hints, m_av_clock, m_Deinterlace, m_hdmi_clock_sync);
+  if(m_boblight){
+      //set the supplied boblight options (code partially from generic boblight client http://code.google.com/p/boblight/source/browse/trunk/src/clients/flagmanager.cpp)
+	 
+      int nrlights = boblight_getnrlights(m_boblight);
+ 
+      bool gamma_override = false;
+      for (unsigned int i = 0; i < m_boblight_options.size(); i++)
+      {
+        std::string option = m_boblight_options[i];
+        std::string lightname;
+        std::string optionname;
+        std::string optionvalue;
+        int lightnr = -1;
+		/*
+        //check if we have a lightname, otherwise we use all lights
+        if (option.find(':') != string::npos)
+        {
+          lightname = option.substr(0, option.find(':'));
+          if (option.find(':') == option.size() - 1) //check if : isn't the last char in the string
+          {
+            printf("Boblight: wrong option \"%s\" syntax, syntax is [lightname:]option=value\n", option.c_str());
+          }
+          option = option.substr(option.find(':') + 1); //shave off the lightname
+
+          //check which light this is
+          bool lightfound = false;
+          for (int j = 0; j < nrlights; j++)
+          {
+            if (lightname == boblight_getlightname(m_boblight, j))
+            {
+              lightfound = true;
+              lightnr = j;
+              break;
+            }
+          }
+          if (!lightfound)
+          {
+            printf("Boblight: light \"%s\" used in option \"%s\" doesn't exist\n", lightname.c_str(), option.c_str());
+            return 0;
+          }
+        }
+		*/
+        //check if '=' exists and it's not at the end of the string
+        if (option.find('=') == string::npos || option.find('=') == option.size() - 1)
+        {
+          printf("Boblight: wrong option \"%s\" syntax, syntax is [light:]option=value", option.c_str());
+          return 0;
+        }
+
+        optionname = option.substr(0, option.find('=')); //option name is everything before = (already shaved off the lightname here)
+        optionvalue = option.substr(option.find('=') + 1); //value is everything after =
+        
+        if(optionname == "gamma")gamma_override=true; //gamma is set by the user
+        option = optionname + " " + optionvalue; //libboblight wants syntax without =
+
+        if (!boblight_setoption(m_boblight, lightnr, option.c_str()))
+        {
+          printf("Boblight: setting option failed %s\n", boblight_geterror(m_boblight));
+          return 0;
+        }
+      }
+      //set video gamma (2.2) if not overridden by the user
+      if(!gamma_override)boblight_setoption(m_boblight, -1, "gamma=2.2");
+    }
+}
+  //end boblight business
+
+  bool bVideoDecoderOpen = m_omxVideo.Open(m_hints, m_av_clock, m_Deinterlace, m_hdmi_clock_sync,m_boblight, m_boblight_sizedown, m_boblight_margin, m_boblight_timeout);
   m_omxVideo.RegisterResolutionUpdateCallBack((void *)this, ResolutionUpdateCallBack);
 
   if(!bVideoDecoderOpen)

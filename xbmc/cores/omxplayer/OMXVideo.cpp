@@ -181,7 +181,7 @@ bool COMXVideo::NaluFormatStartCodes(enum CodecID codec, uint8_t *in_extradata, 
   return false;    
 }
 
-bool COMXVideo::Open(CDVDStreamInfo &hints, OMXClock *clock, bool deinterlace, bool hdmi_clock_sync, float fifo_size, void* boblight_instance, int boblight_sizedown, int boblight_margin, int boblight_timeout)
+bool COMXVideo::Open(CDVDStreamInfo &hints, OMXClock *clock, bool deinterlace, bool hdmi_clock_sync, void* boblight_instance, int boblight_sizedown, int boblight_margin, int boblight_timeout)
 {
   bool vflip = false;
   Close();
